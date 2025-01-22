@@ -9,12 +9,12 @@ import com.github.quantranuk.protobuf.nio.handlers.MessageSendFailureHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSentHandler;
 import com.github.quantranuk.protobuf.nio.utils.DefaultSetting;
 import com.github.quantranuk.protobuf.nio.utils.NamedThreadFactory;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -160,13 +160,13 @@ public class AsyncProtoServerSocketChannel implements ProtoServerSocketChannel {
 
 
     @Override
-    public void sendMessage(SocketAddress socketAddress, Message message) {
+    public void sendMessage(SocketAddress socketAddress, GeneratedMessage message) {
         ProtoSocketChannel protoSocketChannel = socketChannels.get(socketAddress);
         protoSocketChannel.sendMessage(message);
     }
 
     @Override
-    public void sendMessageToAll(Message message) {
+    public void sendMessageToAll(GeneratedMessage message) {
         socketChannels.values().forEach(channel -> channel.sendMessage(message));
     }
 

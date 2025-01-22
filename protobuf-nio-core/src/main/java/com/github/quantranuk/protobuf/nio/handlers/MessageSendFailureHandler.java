@@ -1,6 +1,6 @@
 package com.github.quantranuk.protobuf.nio.handlers;
 
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 import java.net.SocketAddress;
 
@@ -16,5 +16,5 @@ public interface MessageSendFailureHandler {
      * @param message the protobuf message
      * @param t the exception thrown when attempting to write to the socket
      */
-    void onMessageSendFailure(SocketAddress socketAddress, Message message, Throwable t);
+    void onMessageSendFailure(SocketAddress socketAddress, GeneratedMessage message, Throwable t);
 }

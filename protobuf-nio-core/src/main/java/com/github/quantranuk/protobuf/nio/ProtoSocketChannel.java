@@ -5,7 +5,7 @@ import com.github.quantranuk.protobuf.nio.handlers.DisconnectionHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageReceivedHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSendFailureHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSentHandler;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 /**
  * A client to send and receive protobuf messages
@@ -37,7 +37,7 @@ public interface ProtoSocketChannel {
      * Send a protobuf message to the server
      * @param message the protobuf message
      */
-    void sendMessage(Message message);
+    void sendMessage(GeneratedMessage message);
 
     /**
      * Register a handler to be called when the connection is established. Handler must be registered before {@link #connect()} is called

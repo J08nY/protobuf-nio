@@ -1,6 +1,6 @@
 package com.github.quantranuk.protobuf.nio.handlers;
 
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 import java.net.SocketAddress;
 
@@ -15,5 +15,5 @@ public interface MessageReceivedHandler {
      * @param socketAddress address of the remote host that sent the message
      * @param message the protobuf message
      */
-    void onMessageReceived(SocketAddress socketAddress, Message message);
+    void onMessageReceived(SocketAddress socketAddress, GeneratedMessage message);
 }

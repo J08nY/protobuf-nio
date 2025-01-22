@@ -1,6 +1,6 @@
 package com.github.quantranuk.protobuf.nio.sample;
 
-import com.github.quantranuk.protonio.sample.HeartBeat;
+import com.github.quantranuk.protobuf.nio.sample.HeartBeat;
 
 public final class MessageFactory {
 

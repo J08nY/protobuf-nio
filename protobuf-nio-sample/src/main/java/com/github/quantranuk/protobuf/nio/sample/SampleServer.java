@@ -2,7 +2,7 @@ package com.github.quantranuk.protobuf.nio.sample;
 
 import com.github.quantranuk.protobuf.nio.ProtoChannelFactory;
 import com.github.quantranuk.protobuf.nio.ProtoServerSocketChannel;
-import com.github.quantranuk.protonio.sample.HeartBeat;
+import com.github.quantranuk.protobuf.nio.sample.HeartBeat;
 import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

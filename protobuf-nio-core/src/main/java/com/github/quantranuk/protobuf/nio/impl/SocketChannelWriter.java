@@ -2,7 +2,7 @@ package com.github.quantranuk.protobuf.nio.impl;
 
 import com.github.quantranuk.protobuf.nio.serializer.ProtobufSerializer;
 import com.github.quantranuk.protobuf.nio.utils.ByteArrayDequeue;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -15,21 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
+class SocketChannelWriter implements CompletionHandler<Integer, List<GeneratedMessage>> {
 
     private final AsynchronousSocketChannel socketChannel;
-    private final CompletionHandler<Long, Message> messageWriteCompletionHandler;
+    private final CompletionHandler<Long, GeneratedMessage> messageWriteCompletionHandler;
     private final ExecutorService writeExecutor;
-    private final Queue<Message> outboundMessageQueue;
+    private final Queue<GeneratedMessage> outboundMessageQueue;
     private final long writeTimeoutMillis;
     private final ByteArrayDequeue writeBytesQueue;
     private final ByteBuffer writeBuffer;
     private final int writeBufferCapacity;
-    private final List<Message> messagesBeingWritten;
+    private final List<GeneratedMessage> messagesBeingWritten;
     private final AtomicBoolean isWritingInProgress;
     private final int maxMessageWriteQueueSize;
 
-    SocketChannelWriter(AsynchronousSocketChannel socketChannel, long writeTimeoutMillis, int writeBufferCapacity, int maxMessageWriteQueueSize, ExecutorService writeExecutor, CompletionHandler<Long, Message> messageWriteCompletionHandler) {
+    SocketChannelWriter(AsynchronousSocketChannel socketChannel, long writeTimeoutMillis, int writeBufferCapacity, int maxMessageWriteQueueSize, ExecutorService writeExecutor, CompletionHandler<Long, GeneratedMessage> messageWriteCompletionHandler) {
         this.socketChannel = socketChannel;
         this.maxMessageWriteQueueSize = maxMessageWriteQueueSize;
         this.messageWriteCompletionHandler = messageWriteCompletionHandler;
@@ -43,7 +43,7 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
         this.writeBuffer = ByteBuffer.allocate(writeBufferCapacity);
     }
 
-    void addToWriteQueue(Message message) {
+    void addToWriteQueue(GeneratedMessage message) {
         if (outboundMessageQueue.size() > maxMessageWriteQueueSize) {
             throw new IllegalStateException("Unable to accept more message due to outbound message queue is too large (" + outboundMessageQueue.size() + ")");
         }
@@ -70,7 +70,7 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
         int nextMessageSize = 0;
         messagesBeingWritten.clear();
         while (bytesToWrite + nextMessageSize < writeBufferCapacity) {
-            Message message = outboundMessageQueue.poll();
+            GeneratedMessage message = outboundMessageQueue.poll();
             if (message == null) {
                 break;
             }
@@ -80,13 +80,13 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
         }
     }
 
-    private void writeMessages(List<Message> messages) {
+    private void writeMessages(List<GeneratedMessage> messages) {
         writeBytesQueue.clear();
         messages.forEach(message -> writeBytesQueue.push(ProtobufSerializer.serialize(message)));
         writeNextBlock(messages);
     }
 
-    private void writeNextBlock(List<Message> messages) {
+    private void writeNextBlock(List<GeneratedMessage> messages) {
         ByteBuffer nextBlock = writeBytesQueue.popMaximum(writeBufferCapacity);
         if (nextBlock == null) {
             messages.forEach(message -> messageWriteCompletionHandler.completed((long) ProtobufSerializer.getSerializedSize(message), message));
@@ -101,7 +101,7 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
     }
 
     @Override
-    public void completed(Integer result, List<Message> messages) {
+    public void completed(Integer result, List<GeneratedMessage> messages) {
         writeExecutor.execute(() -> {
             int unwrittenBytes = writeBuffer.limit() - result;
             if (unwrittenBytes > 0) {
@@ -112,7 +112,7 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
     }
 
     @Override
-    public void failed(Throwable exc, List<Message> messages) {
+    public void failed(Throwable exc, List<GeneratedMessage> messages) {
         writeExecutor.execute(
                 () -> messages.forEach(
                         message -> messageWriteCompletionHandler.failed(exc, message)));

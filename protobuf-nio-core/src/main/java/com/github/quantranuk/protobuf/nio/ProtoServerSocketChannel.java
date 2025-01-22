@@ -5,7 +5,7 @@ import com.github.quantranuk.protobuf.nio.handlers.DisconnectionHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageReceivedHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSendFailureHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSentHandler;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -33,13 +33,13 @@ public interface ProtoServerSocketChannel {
      * @param message the protobuf message
      * @throws IllegalStateException if the socket address is not connected
      */
-    void sendMessage(SocketAddress socketAddress, Message message);
+    void sendMessage(SocketAddress socketAddress, GeneratedMessage message);
 
     /**
      * <p>Send a message to all connected clients.</p>
      * @param message the protobuf message
      */
-    void sendMessageToAll(Message message);
+    void sendMessageToAll(GeneratedMessage message);
 
     /**
      * Get the list of all connected clients

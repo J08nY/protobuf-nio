@@ -8,12 +8,12 @@ import com.github.quantranuk.protobuf.nio.handlers.MessageSendFailureHandler;
 import com.github.quantranuk.protobuf.nio.handlers.MessageSentHandler;
 import com.github.quantranuk.protobuf.nio.utils.DefaultSetting;
 import com.github.quantranuk.protobuf.nio.utils.NamedThreadFactory;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -132,7 +132,7 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
     }
 
     @Override
-    public void sendMessage(Message message) {
+    public void sendMessage(GeneratedMessage message) {
         if (!socketChannel.isOpen()) {
             throw new IllegalStateException("Socket channel " + socketAddress + " is closed");
         }
@@ -231,15 +231,15 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
         }
     }
 
-    private class MessageReadCompletionHandler implements CompletionHandler<Long, Message> {
+    private class MessageReadCompletionHandler implements CompletionHandler<Long, GeneratedMessage> {
 
         @Override
-        public void completed(Long readBytes, Message message) {
+        public void completed(Long readBytes, GeneratedMessage message) {
             messageReceivedHandlers.forEach(handler -> handler.onMessageReceived(socketAddress, message));
         }
 
         @Override
-        public void failed(Throwable exc, Message message) {
+        public void failed(Throwable exc, GeneratedMessage message) {
             if (!isShuttingDown) {
                 LOGGER.debug("Unable to read from " + socketAddress, exc);
                 disconnect();
@@ -247,15 +247,15 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
         }
     }
 
-    private class MessageWriteCompletionHandler implements CompletionHandler<Long, Message> {
+    private class MessageWriteCompletionHandler implements CompletionHandler<Long, GeneratedMessage> {
 
         @Override
-        public void completed(Long sentBytes, Message message) {
+        public void completed(Long sentBytes, GeneratedMessage message) {
             messageSentHandlers.forEach(handler -> handler.onMessageSent(socketAddress, message));
         }
 
         @Override
-        public void failed(Throwable exc, Message message) {
+        public void failed(Throwable exc, GeneratedMessage message) {
             messageSendFailureHandlers.forEach(handler -> handler.onMessageSendFailure(socketAddress, message, exc));
         }
     }

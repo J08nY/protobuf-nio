@@ -1,7 +1,7 @@
 package com.github.quantranuk.protobuf.nio.serializer;
 
 import com.github.quantranuk.protobuf.nio.utils.ByteUtils;
-import com.google.protobuf.Message;
+import com.google.protobuf.GeneratedMessage;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,7 +39,7 @@ public final class ProtobufSerializer {
      * @param message the protobuf message
      * @return serialized byte arrays
      */
-    public static byte[] serialize(Message message) {
+    public static byte[] serialize(GeneratedMessage message) {
         ByteBuffer encodedProtobufClassName = CHARSET.encode(message.getClass().getName());
         int protobufClassNameLength = encodedProtobufClassName.capacity();
 
@@ -60,7 +60,7 @@ public final class ProtobufSerializer {
      * @param message the protobuf message
      * @return the size of a fully serialized message in bytes (including the header size)
      */
-    public static int getSerializedSize(Message message) {
+    public static int getSerializedSize(GeneratedMessage message) {
         return HEADER_LENGTH + message.getClass().getName().length() + message.getSerializedSize();
     }
 
@@ -97,10 +97,10 @@ public final class ProtobufSerializer {
      * @param protobufPayloadBuffer the buffer that contains the protobuf payload
      * @return the protobuf message
      */
-    public static Message deserialize(ByteBuffer protobufClassNameBuffer, ByteBuffer protobufPayloadBuffer) {
+    public static GeneratedMessage deserialize(ByteBuffer protobufClassNameBuffer, ByteBuffer protobufPayloadBuffer) {
         final Method protobufParseMethod = getParseMethod(protobufClassNameBuffer);
         try {
-            return (Message) protobufParseMethod.invoke(null, (Object) protobufPayloadBuffer);
+            return (GeneratedMessage) protobufParseMethod.invoke(null, (Object) protobufPayloadBuffer);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException("Unable to parse protobuf payload of " + CHARSET.decode(protobufClassNameBuffer).toString(), e);
         }
@@ -117,7 +117,7 @@ public final class ProtobufSerializer {
                 throw new IllegalStateException("Invalid protobuf class name: " + protobufClassName, e);
             }
 
-            if (!Message.class.isAssignableFrom(protobufClass)) {
+            if (!GeneratedMessage.class.isAssignableFrom(protobufClass)) {
                 throw new IllegalStateException(protobufClassName + " is not a protobuf class");
             }
 
