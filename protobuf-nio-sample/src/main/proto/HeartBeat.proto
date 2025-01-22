@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.github.quantranuk.protobuf.nio.sample;
+package sk.neuromancer.protobuf.nio.sample;
 
 message HeartBeatRequest {
     int64 requestTimeMillis = 1;

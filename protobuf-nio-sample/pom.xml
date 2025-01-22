@@ -4,21 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>protobuf-nio</artifactId>
-        <groupId>com.github.quantranuk</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <groupId>sk.neuromancer</groupId>
+        <version>1.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
 
     <artifactId>protobuf-nio-sample</artifactId>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+    <name>protobuf-nio-sample</name>
+    <description>Simple library to send and receive protobuf messages using Java NIO sockets (Sample application).</description>
+    <url>https://github.com/J08nY/protobuf-nio</url>
+
+    <developers>
+        <developer>
+            <id>J08nY</id>
+            <name>Ján Jančár</name>
+            <email>j08ny@neuromancer.sk</email>
+            <url>https://neuromancer.sk/</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/J08nY/protobuf-nio.git</connection>
+        <developerConnection>scm:git:ssh://github.com:J08nY/protobuf-nio.git</developerConnection>
+        <url>https://github.com/J08nY/protobuf-nio/tree/master</url>
+    </scm>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.quantranuk</groupId>
+            <groupId>sk.neuromancer</groupId>
             <artifactId>protobuf-nio-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -57,14 +72,14 @@
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.5.0.Final</version>
+                <version>1.7.1</version>
             </extension>
         </extensions>
         <plugins>
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.5.1</version>
+                <version>0.6.1</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>

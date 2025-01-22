@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/quantranuk/protobuf-nio.svg?branch=master)](https://travis-ci.org/quantranuk/protobuf-nio)
+[![Build and Test](https://github.com/J08nY/protobuf-nio/actions/workflows/build.yaml/badge.svg)](https://github.com/J08nY/protobuf-nio/actions/workflows/build.yaml)
 # protobuf-nio
 Simple library to send and receive [protobuf messages](https://developers.google.com/protocol-buffers/) using Java NIO sockets
+
+**Note, this is a fork of the original. The only changes made were to make this compatible with modern Java and protobuf library.**
 
 ##### Pros
 - Pure Java NIO sockets (no netty / mina dependencies)
