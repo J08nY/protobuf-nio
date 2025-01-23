@@ -30,6 +30,12 @@
 
     <developers>
         <developer>
+            <id>quantranuk</id>
+            <name>Quan Tran</name>
+            <email>quantran.uk@gmail.com</email>
+            <url>https://github.com/quantranuk</url>
+        </developer>
+        <developer>
             <id>J08nY</id>
             <name>Ján Jančár</name>
             <email>j08ny@neuromancer.sk</email>
