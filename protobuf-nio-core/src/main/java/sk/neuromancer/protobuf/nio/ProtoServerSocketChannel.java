@@ -5,7 +5,7 @@ import sk.neuromancer.protobuf.nio.handlers.DisconnectionHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageReceivedHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSendFailureHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSentHandler;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -33,13 +33,13 @@ public interface ProtoServerSocketChannel {
      * @param message the protobuf message
      * @throws IllegalStateException if the socket address is not connected
      */
-    void sendMessage(SocketAddress socketAddress, GeneratedMessage message);
+    void sendMessage(SocketAddress socketAddress, Message message);
 
     /**
      * <p>Send a message to all connected clients.</p>
      * @param message the protobuf message
      */
-    void sendMessageToAll(GeneratedMessage message);
+    void sendMessageToAll(Message message);
 
     /**
      * Get the list of all connected clients

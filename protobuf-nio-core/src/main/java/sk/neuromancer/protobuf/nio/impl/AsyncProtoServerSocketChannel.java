@@ -9,7 +9,7 @@ import sk.neuromancer.protobuf.nio.handlers.MessageSendFailureHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSentHandler;
 import sk.neuromancer.protobuf.nio.utils.DefaultSetting;
 import sk.neuromancer.protobuf.nio.utils.NamedThreadFactory;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,13 +160,13 @@ public class AsyncProtoServerSocketChannel implements ProtoServerSocketChannel {
 
 
     @Override
-    public void sendMessage(SocketAddress socketAddress, GeneratedMessage message) {
+    public void sendMessage(SocketAddress socketAddress, Message message) {
         ProtoSocketChannel protoSocketChannel = socketChannels.get(socketAddress);
         protoSocketChannel.sendMessage(message);
     }
 
     @Override
-    public void sendMessageToAll(GeneratedMessage message) {
+    public void sendMessageToAll(Message message) {
         socketChannels.values().forEach(channel -> channel.sendMessage(message));
     }
 

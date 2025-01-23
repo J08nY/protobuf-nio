@@ -8,7 +8,7 @@ import sk.neuromancer.protobuf.nio.handlers.MessageSendFailureHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSentHandler;
 import sk.neuromancer.protobuf.nio.utils.DefaultSetting;
 import sk.neuromancer.protobuf.nio.utils.NamedThreadFactory;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +132,7 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
     }
 
     @Override
-    public void sendMessage(GeneratedMessage message) {
+    public void sendMessage(Message message) {
         if (!socketChannel.isOpen()) {
             throw new IllegalStateException("Socket channel " + socketAddress + " is closed");
         }
@@ -231,15 +231,15 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
         }
     }
 
-    private class MessageReadCompletionHandler implements CompletionHandler<Long, GeneratedMessage> {
+    private class MessageReadCompletionHandler implements CompletionHandler<Long, Message> {
 
         @Override
-        public void completed(Long readBytes, GeneratedMessage message) {
+        public void completed(Long readBytes, Message message) {
             messageReceivedHandlers.forEach(handler -> handler.onMessageReceived(socketAddress, message));
         }
 
         @Override
-        public void failed(Throwable exc, GeneratedMessage message) {
+        public void failed(Throwable exc, Message message) {
             if (!isShuttingDown) {
                 LOGGER.debug("Unable to read from " + socketAddress, exc);
                 disconnect();
@@ -247,15 +247,15 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
         }
     }
 
-    private class MessageWriteCompletionHandler implements CompletionHandler<Long, GeneratedMessage> {
+    private class MessageWriteCompletionHandler implements CompletionHandler<Long, Message> {
 
         @Override
-        public void completed(Long sentBytes, GeneratedMessage message) {
+        public void completed(Long sentBytes, Message message) {
             messageSentHandlers.forEach(handler -> handler.onMessageSent(socketAddress, message));
         }
 
         @Override
-        public void failed(Throwable exc, GeneratedMessage message) {
+        public void failed(Throwable exc, Message message) {
             messageSendFailureHandlers.forEach(handler -> handler.onMessageSendFailure(socketAddress, message, exc));
         }
     }

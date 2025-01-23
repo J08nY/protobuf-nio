@@ -1,6 +1,6 @@
 package sk.neuromancer.protobuf.nio.handlers;
 
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 
 import java.net.SocketAddress;
 
@@ -15,5 +15,5 @@ public interface MessageReceivedHandler {
      * @param socketAddress address of the remote host that sent the message
      * @param message the protobuf message
      */
-    void onMessageReceived(SocketAddress socketAddress, GeneratedMessage message);
+    void onMessageReceived(SocketAddress socketAddress, Message message);
 }

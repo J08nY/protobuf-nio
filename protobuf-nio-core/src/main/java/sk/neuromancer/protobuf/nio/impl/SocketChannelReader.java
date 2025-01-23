@@ -2,7 +2,7 @@ package sk.neuromancer.protobuf.nio.impl;
 
 import sk.neuromancer.protobuf.nio.serializer.ProtobufSerializer;
 import sk.neuromancer.protobuf.nio.utils.ByteArrayDequeue;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -18,7 +18,7 @@ class SocketChannelReader implements CompletionHandler<Integer, Object> {
     private final ByteArrayDequeue readByteQueue;
     private final AsynchronousSocketChannel socketChannel;
     private final SocketAddress socketAddress;
-    private final CompletionHandler<Long, GeneratedMessage> messageReadCompletionHandler;
+    private final CompletionHandler<Long, Message> messageReadCompletionHandler;
     private final long readTimeoutMillis;
     private final ExecutorService readExecutor;
     private int protobufClassNameLength;
@@ -27,7 +27,7 @@ class SocketChannelReader implements CompletionHandler<Integer, Object> {
     private enum ReadState {READING_MESSAGE_HEADER, READING_MESSAGE_BODY, STOPPED}
     private ReadState readState;
 
-    SocketChannelReader(AsynchronousSocketChannel socketChannel, SocketAddress socketAddress, long readTimeoutMillis, int readBufferCapacity, ExecutorService readExecutor, CompletionHandler<Long, GeneratedMessage> messageReadCompletionHandler) {
+    SocketChannelReader(AsynchronousSocketChannel socketChannel, SocketAddress socketAddress, long readTimeoutMillis, int readBufferCapacity, ExecutorService readExecutor, CompletionHandler<Long, Message> messageReadCompletionHandler) {
         this.socketChannel = socketChannel;
         this.socketAddress = socketAddress;
         this.readExecutor = readExecutor;
@@ -112,7 +112,7 @@ class SocketChannelReader implements CompletionHandler<Integer, Object> {
         }
         ByteBuffer protobufClassNameBytes = readByteQueue.popExactly(protobufClassNameLength);
         ByteBuffer protobufPayloadBytes = readByteQueue.popExactly(protobufPayloadLength);
-        GeneratedMessage message = ProtobufSerializer.deserialize(protobufClassNameBytes, protobufPayloadBytes);
+        Message message = ProtobufSerializer.deserialize(protobufClassNameBytes, protobufPayloadBytes);
         messageReadCompletionHandler.completed((long) protobufPayloadLength, message);
         readState = ReadState.READING_MESSAGE_HEADER;
         return true;

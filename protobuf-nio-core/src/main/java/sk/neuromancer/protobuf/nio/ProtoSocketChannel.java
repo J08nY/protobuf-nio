@@ -5,7 +5,7 @@ import sk.neuromancer.protobuf.nio.handlers.DisconnectionHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageReceivedHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSendFailureHandler;
 import sk.neuromancer.protobuf.nio.handlers.MessageSentHandler;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 
 /**
  * A client to send and receive protobuf messages
@@ -37,7 +37,7 @@ public interface ProtoSocketChannel {
      * Send a protobuf message to the server
      * @param message the protobuf message
      */
-    void sendMessage(GeneratedMessage message);
+    void sendMessage(Message message);
 
     /**
      * Register a handler to be called when the connection is established. Handler must be registered before {@link #connect()} is called
