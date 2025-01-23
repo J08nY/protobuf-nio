@@ -1,5 +1,6 @@
 package com.github.quantranuk.protobuf.nio.impl;
 
+import com.github.quantranuk.protobuf.nio.ProtoSerializer;
 import com.github.quantranuk.protobuf.nio.ProtoServerSocketChannel;
 import com.github.quantranuk.protobuf.nio.ProtoSocketChannel;
 import com.github.quantranuk.protobuf.nio.handlers.ConnectionHandler;
@@ -53,6 +54,7 @@ public class AsyncProtoServerSocketChannel implements ProtoServerSocketChannel {
     private ExecutorService acceptExecutor;
     private ExecutorService readExecutor;
     private ExecutorService writeExecutor;
+    private ProtoSerializer serializer;
 
     public AsyncProtoServerSocketChannel(int port) {
         this.serverPort = port;
@@ -125,6 +127,7 @@ public class AsyncProtoServerSocketChannel implements ProtoServerSocketChannel {
         protobufSocketChannel.addMessageReceivedHandler((socketAddress, message) -> messageReceivedHandlers.forEach(handler -> handler.onMessageReceived(socketAddress, message)));
         protobufSocketChannel.addMessageSentHandler((socketAddress, message) -> messageSentHandlers.forEach(handler -> handler.onMessageSent(socketAddress, message)));
         protobufSocketChannel.addMessageSendFailureHandler((socketAddress, message, t) -> messageSendFailureHandlers.forEach(handler -> handler.onMessageSendFailure(socketAddress, message, t)));
+        protobufSocketChannel.setSerializer(serializer);
         protobufSocketChannel.init();
         return protobufSocketChannel;
     }
@@ -246,4 +249,7 @@ public class AsyncProtoServerSocketChannel implements ProtoServerSocketChannel {
         this.writeTimeoutMillis = writeTimeoutMillis;
     }
 
+    public void setSerializer(ProtoSerializer serializer) {
+        this.serializer = serializer;
+    }
 }

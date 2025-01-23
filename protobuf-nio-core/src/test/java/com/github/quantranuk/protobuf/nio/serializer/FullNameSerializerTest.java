@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ProtobufSerializerTest {
+public class FullNameSerializerTest {
 
     @Test
     public void testRoundTripSerialization() {
@@ -20,14 +20,15 @@ public class ProtobufSerializerTest {
                 .setRequestTimeMillis(requestTimeMillis)
                 .setRequestMessage(requestMessage)
                 .build();
+        FullNameSerializer serializer = new FullNameSerializer();
 
-        byte[] serializedBytes = ProtobufSerializer.serialize(message);
+        byte[] serializedBytes = serializer.serialize(message);
 
-        byte[] header = new byte[ProtobufSerializer.HEADER_LENGTH];
+        byte[] header = new byte[serializer.getHeaderLength()];
         ByteBuffer serializedByteBuffer = ByteBuffer.wrap(serializedBytes);
         serializedByteBuffer.get(header);
-        int protobufClassnameLength = ProtobufSerializer.extractProtobufClassnameLength(header);
-        int protobufPayloadLength = ProtobufSerializer.extractProtobufPayloadLength(header);
+        int protobufClassnameLength = serializer.extractProtobufClassnameLength(header);
+        int protobufPayloadLength = serializer.extractProtobufPayloadLength(header);
 
         assertEquals(message.getClass().getName().length(), protobufClassnameLength);
         assertEquals(message.getSerializedSize(), protobufPayloadLength);
@@ -37,7 +38,7 @@ public class ProtobufSerializerTest {
         serializedByteBuffer.get(protobufClassNameBytes);
         serializedByteBuffer.get(protobufPayloadBytes);
 
-        Message deserializedMessage = ProtobufSerializer.deserialize(ByteBuffer.wrap(protobufClassNameBytes), ByteBuffer.wrap(protobufPayloadBytes));
+        Message deserializedMessage = serializer.deserialize(ByteBuffer.wrap(protobufClassNameBytes), ByteBuffer.wrap(protobufPayloadBytes));
         assertTrue(deserializedMessage instanceof TestHeartBeat.HeartBeatRequest);
 
         assertEquals(requestTimeMillis, ((TestHeartBeat.HeartBeatRequest) deserializedMessage).getRequestTimeMillis());

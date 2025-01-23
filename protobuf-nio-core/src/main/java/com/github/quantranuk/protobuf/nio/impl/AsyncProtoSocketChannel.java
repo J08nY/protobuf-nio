@@ -1,19 +1,17 @@
 package com.github.quantranuk.protobuf.nio.impl;
 
+import com.github.quantranuk.protobuf.nio.ProtoSerializer;
 import com.github.quantranuk.protobuf.nio.ProtoSocketChannel;
-import com.github.quantranuk.protobuf.nio.handlers.ConnectionHandler;
-import com.github.quantranuk.protobuf.nio.handlers.DisconnectionHandler;
-import com.github.quantranuk.protobuf.nio.handlers.MessageReceivedHandler;
-import com.github.quantranuk.protobuf.nio.handlers.MessageSendFailureHandler;
-import com.github.quantranuk.protobuf.nio.handlers.MessageSentHandler;
+import com.github.quantranuk.protobuf.nio.handlers.*;
+import com.github.quantranuk.protobuf.nio.serializer.FullNameSerializer;
 import com.github.quantranuk.protobuf.nio.utils.DefaultSetting;
 import com.github.quantranuk.protobuf.nio.utils.NamedThreadFactory;
 import com.google.protobuf.Message;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -21,11 +19,7 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 public class AsyncProtoSocketChannel implements ProtoSocketChannel {
 
@@ -53,6 +47,7 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
     private boolean isInjectedWriteExecutor = false;
     private ExecutorService readExecutor;
     private ExecutorService writeExecutor;
+    private ProtoSerializer serializer;
     private AsynchronousChannelGroup channelGroup;
 
     public AsyncProtoSocketChannel(SocketAddress socketAddress) {
@@ -83,8 +78,11 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
                 throw new IllegalStateException("Unable to open socket channel", e);
             }
         }
-        reader = new SocketChannelReader(socketChannel, socketAddress, readTimeoutMillis, readBufferSize, readExecutor, new MessageReadCompletionHandler());
-        writer = new SocketChannelWriter(socketChannel, writeTimeoutMillis, writeBufferSize, maxMessageWriteQueueSize, writeExecutor, new MessageWriteCompletionHandler());
+        if (serializer == null) {
+            serializer = new FullNameSerializer();
+        }
+        reader = new SocketChannelReader(socketChannel, socketAddress, readTimeoutMillis, readBufferSize, readExecutor, serializer, new MessageReadCompletionHandler());
+        writer = new SocketChannelWriter(socketChannel, writeTimeoutMillis, writeBufferSize, maxMessageWriteQueueSize, writeExecutor, serializer, new MessageWriteCompletionHandler());
     }
 
     @Override
@@ -95,9 +93,9 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
             connectionHandlers.forEach(handler -> handler.onConnected(socketAddress));
             reader.start();
         } catch (InterruptedException e) {
-            LOGGER.debug("Interrupted while connecting to "+ socketAddress, e);
+            LOGGER.debug("Interrupted while connecting to " + socketAddress, e);
             Thread.currentThread().interrupt();
-        }catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             LOGGER.error("An error has occurred while trying connect to " + socketAddress, e);
             disconnect();
         }
@@ -223,6 +221,10 @@ public class AsyncProtoSocketChannel implements ProtoSocketChannel {
         validateSingleThreadedPool(executor);
         this.writeExecutor = executor;
         this.isInjectedWriteExecutor = executor != null;
+    }
+
+    public void setSerializer(ProtoSerializer serializer) {
+        this.serializer = serializer;
     }
 
     private static void validateSingleThreadedPool(ExecutorService executor) {

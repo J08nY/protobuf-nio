@@ -16,6 +16,7 @@ public final class ProtoChannelFactory {
 
     /**
      * Create a new builder for {@link ProtoSocketChannel}
+     *
      * @param host the host to connect to
      * @param port the port to connect to
      * @return a builder for {@link ProtoSocketChannel}
@@ -26,10 +27,11 @@ public final class ProtoChannelFactory {
 
     /**
      * Create a new builder for {@link ProtoServerSocketChannel}
+     *
      * @param port the port to listen to
      * @return a builder for {@link ProtoServerSocketChannel}
      */
-    public static ServerBuilder newServer( int port) {
+    public static ServerBuilder newServer(int port) {
         return new ServerBuilder(port);
     }
 
@@ -45,6 +47,7 @@ public final class ProtoChannelFactory {
         private long writeTimeoutMillis = DefaultSetting.DEFAULT_WRITE_TIMEOUT_MILLIS;
         private ExecutorService readExecutor = null;
         private ExecutorService writeExecutor = null;
+        private ProtoSerializer serializer = null;
 
         private ClientBuilder(String host, int port) {
             this.host = host;
@@ -53,6 +56,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The size of the buffer used to read from the socket channel. The default value is 8192 (8 KB)
+         *
          * @param readBufferSize readBufferSize
          * @return builder
          */
@@ -63,6 +67,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The size of the buffer used to write to the socket channel. The default value is 8192 (8 KB)
+         *
          * @param writeBufferSize writeBufferSize
          * @return builder
          */
@@ -73,6 +78,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The timeout in milliseconds for reading from the socket. The default value is 0 (no timeout)
+         *
          * @param readTimeoutMillis readTimeoutMillis
          * @return builder
          */
@@ -83,6 +89,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The timeout in milliseconds for reading from the socket. The default value is 10000 (10 seconds)
+         *
          * @param writeTimeoutMillis writeTimeoutMillis
          * @return builder
          */
@@ -95,6 +102,7 @@ public final class ProtoChannelFactory {
          * <p>The executor that will execute read activities. This must be a single thread executor only.
          * Use this method to share the same thread between multiple clients</p>
          * <p>If not set a new thread will be spawn by default</p>
+         *
          * @param readExecutor readExecutor
          * @return builder
          */
@@ -107,6 +115,7 @@ public final class ProtoChannelFactory {
          * <p>The executor that will execute write activities. This must be a single thread executor only.
          * Use this method to share the same thread between multiple clients</p>
          * <p>If not set a new thread will be spawn by default</p>
+         *
          * @param writeExecutor writeExecutor
          * @return builder
          */
@@ -116,7 +125,19 @@ public final class ProtoChannelFactory {
         }
 
         /**
+         * Set the serializer to serialize and deserialize the messages.
+         *
+         * @param serializer the serializer
+         * @return builder
+         */
+        public ClientBuilder setSerializer(ProtoSerializer serializer) {
+            this.serializer = serializer;
+            return this;
+        }
+
+        /**
          * Build the {@link ProtoServerSocketChannel}
+         *
          * @return ProtoSocketChannel
          */
         public ProtoSocketChannel build() {
@@ -127,6 +148,7 @@ public final class ProtoChannelFactory {
             channel.setWriteTimeoutMillis(writeTimeoutMillis);
             channel.setReadExecutor(readExecutor);
             channel.setWriteExecutor(writeExecutor);
+            channel.setSerializer(serializer);
             channel.init();
             return channel;
         }
@@ -141,6 +163,7 @@ public final class ProtoChannelFactory {
         private int writeBufferSize = DefaultSetting.DEFAULT_CLIENT_BUFFER_SIZE;
         private long readTimeoutMillis = DefaultSetting.DEFAULT_READ_TIMEOUT_MILLIS;
         private long writeTimeoutMillis = DefaultSetting.DEFAULT_WRITE_TIMEOUT_MILLIS;
+        private ProtoSerializer serializer = null;
 
         private ServerBuilder(int port) {
             this.port = port;
@@ -148,6 +171,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The size of the buffer used to read from the socket channel. The default value is 8192 (8 KB)
+         *
          * @param readBufferSize readBufferSize
          * @return builder
          */
@@ -158,6 +182,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The size of the buffer used to write to the socket channel. The default value is 8192 (8 KB)
+         *
          * @param writeBufferSize writeBufferSize
          * @return builder
          */
@@ -168,6 +193,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The timeout in milliseconds for reading from the socket. The default value is 0 (no timeout)
+         *
          * @param readTimeoutMillis readTimeoutMillis
          * @return builder
          */
@@ -178,6 +204,7 @@ public final class ProtoChannelFactory {
 
         /**
          * The timeout in milliseconds for reading from the socket. The default value is 10000 (10 seconds)
+         *
          * @param writeTimeoutMillis writeTimeoutMillis
          * @return builder
          */
@@ -187,7 +214,19 @@ public final class ProtoChannelFactory {
         }
 
         /**
+         * Set the serializer to serialize and deserialize the messages.
+         *
+         * @param serializer the serializer
+         * @return builder
+         */
+        public ServerBuilder setSerializer(ProtoSerializer serializer) {
+            this.serializer = serializer;
+            return this;
+        }
+
+        /**
          * Build the {@link ProtoServerSocketChannel}
+         *
          * @return ProtoSocketChannel
          */
         public ProtoServerSocketChannel build() {
@@ -196,6 +235,7 @@ public final class ProtoChannelFactory {
             channel.setWriteBufferSize(writeBufferSize);
             channel.setReadTimeoutMillis(readTimeoutMillis);
             channel.setWriteTimeoutMillis(writeTimeoutMillis);
+            channel.setSerializer(serializer);
             channel.init();
             return channel;
         }

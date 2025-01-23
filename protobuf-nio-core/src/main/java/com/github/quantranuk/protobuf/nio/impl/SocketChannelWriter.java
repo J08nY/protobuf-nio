@@ -1,6 +1,6 @@
 package com.github.quantranuk.protobuf.nio.impl;
 
-import com.github.quantranuk.protobuf.nio.serializer.ProtobufSerializer;
+import com.github.quantranuk.protobuf.nio.ProtoSerializer;
 import com.github.quantranuk.protobuf.nio.utils.ByteArrayDequeue;
 import com.google.protobuf.Message;
 
@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
 
     private final AsynchronousSocketChannel socketChannel;
+    private final ProtoSerializer serializer;
     private final CompletionHandler<Long, Message> messageWriteCompletionHandler;
     private final ExecutorService writeExecutor;
     private final Queue<Message> outboundMessageQueue;
@@ -29,8 +30,9 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
     private final AtomicBoolean isWritingInProgress;
     private final int maxMessageWriteQueueSize;
 
-    SocketChannelWriter(AsynchronousSocketChannel socketChannel, long writeTimeoutMillis, int writeBufferCapacity, int maxMessageWriteQueueSize, ExecutorService writeExecutor, CompletionHandler<Long, Message> messageWriteCompletionHandler) {
+    SocketChannelWriter(AsynchronousSocketChannel socketChannel, long writeTimeoutMillis, int writeBufferCapacity, int maxMessageWriteQueueSize, ExecutorService writeExecutor, ProtoSerializer serializer, CompletionHandler<Long, Message> messageWriteCompletionHandler) {
         this.socketChannel = socketChannel;
+        this.serializer = serializer;
         this.maxMessageWriteQueueSize = maxMessageWriteQueueSize;
         this.messageWriteCompletionHandler = messageWriteCompletionHandler;
         this.writeExecutor = writeExecutor;
@@ -75,21 +77,21 @@ class SocketChannelWriter implements CompletionHandler<Integer, List<Message>> {
                 break;
             }
             messagesBeingWritten.add(message);
-            bytesToWrite += ProtobufSerializer.getSerializedSize(message);
-            nextMessageSize = outboundMessageQueue.isEmpty() ? 0 : ProtobufSerializer.getSerializedSize(outboundMessageQueue.peek());
+            bytesToWrite += serializer.getSerializedSize(message);
+            nextMessageSize = outboundMessageQueue.isEmpty() ? 0 : serializer.getSerializedSize(outboundMessageQueue.peek());
         }
     }
 
     private void writeMessages(List<Message> messages) {
         writeBytesQueue.clear();
-        messages.forEach(message -> writeBytesQueue.push(ProtobufSerializer.serialize(message)));
+        messages.forEach(message -> writeBytesQueue.push(serializer.serialize(message)));
         writeNextBlock(messages);
     }
 
     private void writeNextBlock(List<Message> messages) {
         ByteBuffer nextBlock = writeBytesQueue.popMaximum(writeBufferCapacity);
         if (nextBlock == null) {
-            messages.forEach(message -> messageWriteCompletionHandler.completed((long) ProtobufSerializer.getSerializedSize(message), message));
+            messages.forEach(message -> messageWriteCompletionHandler.completed((long) serializer.getSerializedSize(message), message));
             checkMessageQueue();
             return;
         }
