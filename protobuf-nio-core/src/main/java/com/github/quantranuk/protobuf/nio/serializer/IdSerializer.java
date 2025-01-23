@@ -7,10 +7,16 @@ import com.google.protobuf.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class IdSerializer implements ProtoSerializer {
+/**
+ * <p>A serializer to serialize Protobuf messages into bytes array and deserialize bytes array back into Protobuf message</p>
+ */
+public final class IdSerializer implements ProtoSerializer {
     private final Map<Integer, Method> parseMethods = new ConcurrentHashMap<>();
     private final Map<Class<? extends Message>, Integer> idMap = new ConcurrentHashMap<>();
 
@@ -78,5 +84,11 @@ public class IdSerializer implements ProtoSerializer {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException("Unable to parse protobuf payload of " + messageId, e);
         }
+    }
+
+    public static IdSerializer create(List<Class<? extends Message>> classes) {
+        Map<Class<? extends Message>, Integer> idMap = new HashMap<>();
+        classes.stream().sorted(Comparator.comparing(Class::getName)).forEach(clazz -> idMap.put(clazz, idMap.size() + 1));
+        return new IdSerializer(idMap);
     }
 }

@@ -5,10 +5,10 @@ import com.google.protobuf.Message;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IdSerializerTest {
 
@@ -25,7 +25,6 @@ public class IdSerializerTest {
         IdSerializer serializer = new IdSerializer(idMap);
 
         byte[] serializedBytes = serializer.serialize(message);
-        System.out.println("Serialized bytes: " + serializedBytes.length);
 
         byte[] header = new byte[serializer.getHeaderLength()];
         ByteBuffer serializedByteBuffer = ByteBuffer.wrap(serializedBytes);
@@ -45,6 +44,12 @@ public class IdSerializerTest {
 
         assertEquals(requestTimeMillis, ((TestHeartBeat.HeartBeatRequest) deserializedMessage).getRequestTimeMillis());
         assertEquals(requestMessage, ((TestHeartBeat.HeartBeatRequest) deserializedMessage).getRequestMessage());
+    }
+
+    @Test
+    public void testCreation() {
+        IdSerializer serializer = IdSerializer.create(List.of(TestHeartBeat.HeartBeatRequest.class));
+        assertNotNull(serializer);
     }
 
 }
